@@ -10,7 +10,7 @@ class Usuario extends Save {
     protected $login;
     protected $senha;
     protected $nome;
-    protected $numFotos = 2;
+    protected $numFotos = 17;
     protected $nivel = 0; // nivel de acesso do usuário comum.
 
     public function __construct(string $login, string $senha, string $nome) {
@@ -33,6 +33,7 @@ class Usuario extends Save {
         }
         return 0;
     }
+
     public function getNumFotos(){
         return $this->numFotos;
     }

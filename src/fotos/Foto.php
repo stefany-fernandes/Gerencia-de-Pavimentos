@@ -9,32 +9,54 @@ use save\Save;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class Foto extends Save {
-    protected $nome;
     protected $defeito;
     public $fotoDefeito;
     public $autor; // usuario que enviou a foto.
 
-    public function __construct(string $nome, string $defeito, string $caminho, string $autor) {
-        $this->nome=$nome;
+    /**
+     * Foto constructor.
+     * @param string $defeito
+     * @param string $caminho
+     * @param string $autor
+     */
+    public function __construct(string $defeito, string $caminho, string $autor) {
         $this->defeito = $defeito;
         $this->fotoDefeito=$caminho;
         $this->autor = $autor;
     }
+
+    /**
+     * @return string
+     * retorna o defeito da foto
+     */
     public function carregarDefeito(){
         return $this->defeito;
     }
 
+    /**
+     * @return string
+     * retorna o caminho da foto.
+     */
     public function carregarFoto(){
         return $this->fotoDefeito;
     }
 
-    public function getNome(){
-        return $this->nome;
-    }
-
+    /**
+     * @return string
+     * retorna o usuario que enviou a foto
+     */
     public function getAutor(){
         return $this->autor;
     }
+
+    /**
+     * @param string $nomeUser
+     * @param int $nivel
+     * @return string
+     *
+     * método responsável por retornar o caminho da foto, juntamente com um css.
+     *
+     */
     public static function getCaminho (string $nomeUser, int $nivel)
     {
         $A = '';
@@ -55,8 +77,8 @@ class Foto extends Save {
                     <div class="card-image">
                         <img src="../'.$serial->carregarFoto().'">
                         <form id ="Form'.$formCount.'" form action = "delete" method="POST">
-                        <span class="card-title">'.$serial->getNome().'</span>
-                        <input type="hidden" value = "'.$serial->getNome().'" name="A" />
+                        <span class="card-title">'.$serial->carregarDefeito().'</span>
+                        <input type="hidden" value = "'.$serial->carregarDefeito().'" name="A" />
                         <a class="btn-floating halfway-fab waves-effect waves-light red" onclick="document.getElementById(\'Form'.$formCount.'\').submit()"><i class="material-icons">mode_edit</i></a>
                         </form>
                     </div>
@@ -73,17 +95,28 @@ class Foto extends Save {
 
     }
 
+    /**
+     * Metodo resposável pela deleção da foto no servidor.
+     */
     public function delete() {
         $contents = file_get_contents(static::getClassName() . '.txt');
         $contents = str_replace(serialize($this) . PHP_EOL, '', $contents);
         file_put_contents($this->getClassName() . '.txt', $contents);
-       // unlink(__DIR__.'/../../web/'.$this->fotoDefeito);
+        $A = __DIR__.'/../../web/'.$this->carregarFoto();
+        unlink($A);
     }
 
+    /**
+     * @return string
+     */
     public static function getIdAttribute()
     {
-        return 'nome';
+        return 'defeito';
     }
+
+    /**
+     * @return string
+     */
     public static function getClassName()
     {
         return 'Foto';

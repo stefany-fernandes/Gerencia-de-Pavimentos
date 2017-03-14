@@ -66,7 +66,7 @@ class FotoController
             if ($usuario->getNumFotos() != 0) {
                 if (move_uploaded_file($_FILES['arq']['tmp_name'], $uploadFile)) {
                     echo "Arquivo válido e enviado com sucesso.\n";
-                    $foto = new Foto($request->request->get('Nome'), $request->request->get('Defeito'), $uploadFile, $this->session->get('user')->getLogin());
+                    $foto = new Foto($request->request->get('Defeito'), $uploadFile, $this->session->get('user')->getLogin());
                     $foto->save();
                     $usuario->diminuiFotos();
                     $usuario->save();
