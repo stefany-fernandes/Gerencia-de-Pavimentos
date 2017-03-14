@@ -1,0 +1,12 @@
+<phpunit colors="true" >
+    <testsuites>
+        <testsuite name="Gerencia Test Suit">
+            <directory>./tests</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true" >
+            <directory suffix=".php" >./src/date/</directory>
+        </whitelist>
+    </filter>
+</phpunit>
