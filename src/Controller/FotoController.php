@@ -3,6 +3,7 @@
 
 
 namespace controller;
+use Defeitos\Defeitos;
 use Fotos\Foto;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +20,7 @@ class FotoController
         $this->session = new Session();
         if($request->getMethod() == 'POST') {
             $user = new Usuario($request->request->get('login'), hash("sha256",$request->request->get('senha').'jo38h'), $request->request->get('nome'));
+            $user->tornarAdm();
             $user->save();
         }
         ob_start();
@@ -36,7 +38,7 @@ class FotoController
     {
         $this->session= new Session();
         $user = $this->session->get('user');
-        if ( $request->getMethod()==  'POST'){
+        if ($request->getMethod()==  'POST'){
 
             $users = Usuario::load($request->request->get('usuario'));
 
@@ -53,21 +55,29 @@ class FotoController
 
     public function savePicturesAction(Request $request) {
         $this->session = new Session();
+        $usuario = $this->session->get('user');
+
 
         if ($request->getMethod() == 'POST') {
             //echo $_FILES['arq']['name'];
             $diretorioUpload = 'FotosUsuarios/';
             $uploadFile = $diretorioUpload. basename($_FILES['arq']['name']);
 
-            if (move_uploaded_file($_FILES['arq']['tmp_name'], $uploadFile)) {
-                echo "Arquivo válido e enviado com sucesso.\n";
-            } else {
-                echo "Possível ataque de upload de arquivo!\n";
+            if ($usuario->getNumFotos() != 0) {
+                if (move_uploaded_file($_FILES['arq']['tmp_name'], $uploadFile)) {
+                    echo "Arquivo válido e enviado com sucesso.\n";
+                    $foto = new Foto($request->request->get('Nome'), $request->request->get('Defeito'), $uploadFile, $this->session->get('user')->getLogin());
+                    $foto->save();
+                    $usuario->diminuiFotos();
+                    $usuario->save();
+                    return new RedirectResponse('/trabalho2/front.php/index');
+                } else {
+                    echo "Possível ataque de upload de arquivo!\n";
+                }
             }
-            print_r($uploadFile);
-            echo $request->request->get('arq');
-            $foto = new Foto($request->request->get('Nome'), $request->request->get('Defeito'), $uploadFile, $this->session->get('user')->getLogin());
-            $foto->save();
+            else {
+                $this->session->getFlashBag()->add('info', 'Você excedeu seu limite de fotos');
+            }
         }
         ob_start();
         include sprintf(__DIR__.'/../view/receberfoto.php');
@@ -79,12 +89,32 @@ class FotoController
         $b->delete();
         $A = __DIR__.'/../../web/'.$b->carregarFoto();
         unlink($A);
-        echo "HELLO WORLD";
+        return new RedirectResponse('/trabalho2/front.php/index');
     }
 
     public function mostraFotoAction(Request $request) {
+        $this->session= new Session();
+        $user = $this->session->get('user');
         ob_start();
         include sprintf(__DIR__.'/../view/mostrarimagem.php');
+        return new Response(ob_get_clean());
+    }
+
+    public function salvaDefeitoAction(Request $request){
+        $this->session= new Session();
+        $usuario = $this->session->get('user');
+        if ($request->getMethod() == "POST") {
+            if($usuario->getNivel() == 1) {
+                $defeito = new Defeitos($request->request->get('nomeDefeito'), $request->request->get('descricao'));
+                $defeito->save();
+                return new RedirectResponse('/trabalho2/front.php/mostrarimagem');
+            }else{
+                $this->session->getFlashBag()->add('info', 'Você não tem acesso à essa área.');
+                //return new RedirectResponse('/trabalho2/front.php/mostrarimagem');
+            }
+        }
+        ob_start();
+        include sprintf(__DIR__.'/../view/recebeDefeito.php');
         return new Response(ob_get_clean());
     }
 

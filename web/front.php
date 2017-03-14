@@ -29,6 +29,12 @@ $routes->add('mostrarfoto',new Routing\Route('/mostrarimagem',[
     )
 );
 
+$routes->add('recebe_defeito',new Routing\Route('/receberdefeito',[
+            '_controller'=>'Controller\FotoController::salvaDefeitoAction'
+        ]
+    )
+);
+
 $routes->add('salvarfoto',new Routing\Route('/salvarfoto',[
             '_controller'=>'Controller\FotoController::savePicturesAction'
         ]

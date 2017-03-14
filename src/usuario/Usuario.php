@@ -10,13 +10,31 @@ class Usuario extends Save {
     protected $login;
     protected $senha;
     protected $nome;
-    protected $numFotos = 17;
+    protected $numFotos = 2;
     protected $nivel = 0; // nivel de acesso do usuário comum.
 
     public function __construct(string $login, string $senha, string $nome) {
         $this->login=$login;
         $this->senha = $senha;
         $this->nome=$nome;
+    }
+
+    /**
+     *
+     * retorna -1 se o usuário já atingiu seu limite de fotos (17)
+     * retorna 0 se ele pode adicionar uma foto.
+     * @return int
+     *
+     */
+    public function diminuiFotos(){
+        $this->numFotos = $this->numFotos - 1;
+        if ($this->numFotos == 0) {
+            return -1;
+        }
+        return 0;
+    }
+    public function getNumFotos(){
+        return $this->numFotos;
     }
 
     public function tornarADM() {

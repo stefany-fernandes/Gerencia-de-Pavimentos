@@ -12,6 +12,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css">
 </head>
 <body>
+<?php
+foreach ($this->session->getFlashBag()->all() as $type => $messages) {
+foreach ($messages as $message) {
+echo '<div class="row">
+    <div class="col s12 m5">
+        <div class="card-panel teal">
+            <span class="white-text">'.$message.'</div></span>
+    </div>
+</div>
+</div>';
+}
+}?>
 <nav class="light-blue lighten-1" role="navigation">
     <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Logo</a>
         <ul class="right hide-on-med-and-down">
@@ -45,7 +57,8 @@
 
         <!--   Icon Section   -->
         <div class="row">
-        <?php echo \Fotos\Foto::getCaminho(); ?>
+        <?php
+        echo \Fotos\Foto::getCaminho($user->getLogin(),$user->getNivel()); ?>
         </div>
 
     </div>

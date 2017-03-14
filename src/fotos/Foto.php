@@ -3,7 +3,7 @@
 declare (strict_types=1);
 
 namespace Fotos;
-use Administrador\Administrador;
+
 use defeitos\Defeitos;
 use save\Save;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -16,9 +16,12 @@ class Foto extends Save {
 
     public function __construct(string $nome, string $defeito, string $caminho, string $autor) {
         $this->nome=$nome;
-        $this->defeito = Defeitos::load($defeito);
+        $this->defeito = $defeito;
         $this->fotoDefeito=$caminho;
         $this->autor = $autor;
+    }
+    public function carregarDefeito(){
+        return $this->defeito;
     }
 
     public function carregarFoto(){
@@ -28,7 +31,11 @@ class Foto extends Save {
     public function getNome(){
         return $this->nome;
     }
-    public static function getCaminho ()
+
+    public function getAutor(){
+        return $this->autor;
+    }
+    public static function getCaminho (string $nomeUser, int $nivel)
     {
         $A = '';
         $formCount  = 0;
@@ -40,6 +47,9 @@ class Foto extends Save {
                 break;
             }
             $serial = unserialize($obj);
+            $defeit = Defeitos::load($serial->carregarDefeito());
+            if($nomeUser == $serial->getAutor() || $nivel == 1){
+
             $A = $A . '<div class="col s12 m6">
                 <div class="card">
                     <div class="card-image">
@@ -51,43 +61,23 @@ class Foto extends Save {
                         </form>
                     </div>
                     <div class="card-content">
-                        <p>'.'</p>
+                        <p>'.(($defeit != null)? $defeit->getDescricao():'').'</p>
                     </div>
                 </div>
             </div>
             ';
             $formCount++;
         }
+        }
         return $A;
 
     }
 
-    protected function deletarFoto() {
-
-    }
-
-    protected function verFoto() {
-
-    }
-
-    protected function incluirDescricao(){
-
-    }
-
-    protected function lerDescricao(){
-
-    }
-    protected function alterarDescricao(){
-
-    }
-    protected function incluirFoto(){
-
-    }
     public function delete() {
         $contents = file_get_contents(static::getClassName() . '.txt');
         $contents = str_replace(serialize($this) . PHP_EOL, '', $contents);
         file_put_contents($this->getClassName() . '.txt', $contents);
-        unlink(__DIR__.'/../../web/'.$this->fotoDefeito);
+       // unlink(__DIR__.'/../../web/'.$this->fotoDefeito);
     }
 
     public static function getIdAttribute()
