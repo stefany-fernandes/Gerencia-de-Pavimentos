@@ -17,7 +17,6 @@ class testDefeitos extends \PHPUnit\Framework\TestCase {
         $this->assertEquals($defeito->getNomeDefeito(), $nomeDefeito);
     }
 
-
     /**
      * @return array
      */
